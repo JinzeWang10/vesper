@@ -1,6 +1,6 @@
-# rixing （日省）— skill skeleton（v0，占位）
+# Vesper （日省）— skill skeleton（v0，占位）
 
-> ⚠️ 这是骨架占位。完整行为待 `docs/plans/2026-06-17-rixing-v0-design.md` 写出实现计划后填充。
+> ⚠️ 这是骨架占位。完整行为待 `docs/plans/2026-06-17-vesper-v0-design.md` 写出实现计划后填充。
 
 ## 触发
 

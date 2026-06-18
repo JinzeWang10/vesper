@@ -1,4 +1,4 @@
-# 日省 · rixing
+# 日省 · Vesper
 
 > 一个长在你编码 agent 里的极简反思 skill ——
 > **每天收工时，只问你一个问题，然后安静退场。**
@@ -7,7 +7,7 @@
 
 ## 这是什么
 
-当所有 AI 工具都在帮你「做更多、追更快」的时候，`rixing` 反着来：
+当所有 AI 工具都在帮你「做更多、追更快」的时候，`Vesper` 反着来：
 它在你一天 vibe coding 结束、正要合上电脑的那一刻，**安静地问你一个关于你自己的问题**，
 收下你的回答，**不评判、不建议、不啰嗦**，然后退场。
 
@@ -38,7 +38,7 @@
 
 ## 状态
 
-🚧 **v0 设计中。** 完整设计见 [docs/plans/2026-06-17-rixing-v0-design.md](docs/plans/2026-06-17-rixing-v0-design.md)。
+🚧 **v0 设计中。** 完整设计见 [docs/plans/2026-06-17-vesper-v0-design.md](docs/plans/2026-06-17-vesper-v0-design.md)。
 
 ## License
 
