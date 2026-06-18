@@ -1,0 +1,23 @@
+# ⚠️ 用户的回答是最私密的内心数据，永不进版本库
+data/
+*.local
+.reflections/
+
+# Node
+node_modules/
+dist/
+.env
+.env.*
+npm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
