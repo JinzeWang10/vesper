@@ -42,13 +42,15 @@
 2. **答完当场不回应。** 只温柔收下（「记住了，明天见」）。无多巴胺、不让人表演给 AI 看。
 3. **极简 / 沉浸 / 放松。** 砍掉一切制造压力的东西：**无连续打卡天数、无分数、无社交、无多余推送**。一天一个温柔提醒足矣。可跳过、绝不追问。
 4. **Local-first。** 回答是最私密内心数据，**全部存本地，永不上传**（已在 `.gitignore` 排除 `data/`）。
+5. **回答 append-only、逐字、永不被改写。** entries 是用户原话，LLM 只读它、只写派生索引（`themes.md`）。对应 resume-coach「永不覆盖用户原始简历」。
 
 ## 5. 智能在哪（产品内核 + FDE 故事）
 
 **① 问题长在历史之上（不是随机/固定）**
 - 由 agent 读用户过去的回答来生成今天的问题：顺着上次往深问、偶尔把旧答案照回来（**带出处**：「三周前你也说过一模一样的话」）。
 - 用得越久越懂你 → 真·数据飞轮，且攒的是用户的自我认知。
-- 技术映射：个人回答库 RAG + 记忆 + 带出处引用。
+- **技术映射（已 right-size，见 §7）**：不是向量 RAG，是「近窗整读 + 主题索引 + 带出处引用」，参照 resume-coach 的 `sessions/` + `weaknesses.md`。
+- **Right-size 判断 = FDE 叙事**：一天一条、一年塞得进一个 context，向量 RAG 是过度工程。把「量了数据量→判断不需要 embedding→改 themes 索引+近窗→eval 证明挑『照回』比 naive cosine 准」讲成故事，比硬凑 pgvector 更打动人。embedding 留可插拔后端。
 
 **② 两种节奏分开**
 - **每日**：问 → 答 → 安静收下（保「放松沉浸」）。
@@ -95,14 +97,33 @@ PUSH（只留一个）：
 
 **待实现时核实**：`Stop` hook 在各 agent 里的精确语义、注入提醒的具体 JSON 字段、关窗算不算 session 结束。
 
-## 7. 技术骨架（待写实现计划时细化）
+## 7. 技术骨架：智能内核（已精修）
 
-- 本地存储：用户回答 + 元数据（时间戳等）落本地文件，`data/` 已 gitignore。
-- 问题生成：读历史 → RAG/检索相关旧答案 → 生成苏格拉底式新问（带出处）。
-- 触发：hook（傍晚 + session 结束 + 每日一次闸）+ 手动命令。
-- 周期回看：扫一段窗口的回答 → 归纳模式 → 带出处呈现。
-- 加分：MCP server 暴露记忆/反思能力。
-- 模型与运行位置（本地模型 vs 云端、隐私边界）：**实现阶段再定**（涉及 LLM 选型时核对 claude-api 参考）。
+记忆架构抄「带记忆 skill」普适形状——**raw 原始库 + distilled 蒸馏索引（带回指出处）**。走 resume-coach 路线（纯 markdown + 近窗整读），不走 gbrain（向量库）。
+
+**存储布局**（用户级，见 §6）：
+```
+~/.vesper/                  # 用户全局，永不上传
+  entries/2026-06-25.md     # 一天一文件，append-only、逐字、永不改写（raw）
+  themes.md                 # 主题/线索索引，LLM 维护，带日期出处（distilled）
+  state.json                # 每日闸：last_asked / last_reminded
+repo/skill/seeds/{zh,en}.md # 冷启动种子题（随 skill 发布，是代码不是数据）
+```
+
+**entry schema**（对应 sessions/*.md）：frontmatter `date / question / resurfaced_from?(照回的旧日期) / themes[]` + 逐字回答正文。
+
+**themes.md schema**（对应 weaknesses.md）：`## theme:累` 下挂「日期 + 一句引用」列表。一个文件供三用：挑「照回」旧答案、镜子时刻数行数、年度礼物。
+
+**生成今日问题（读）**：① 整读最近 ~14 天 entries ② 读 themes.md ③ 决策「线索深挖」或「旧答照回」 ④ 出一个苏格拉底式向内问题，照回则带日期出处。库空的冷启动 1~7 天取 `seeds/`。
+
+**收下回答（写）**：① 写 entry（逐字 append-only）② 更新 themes.md（grep 去重追加日期+引用）③ 更新 state.json `last_asked` ④ 攒够周/月/年则搭车提议镜子/年度礼物。
+
+**镜子时刻**：扫窗口 entries + themes.md → LLM 归纳模式 → 带出处呈现。同存储另一种读法，无额外基建。
+
+**待定**：
+- 加分：`~/.vesper/` 记忆层暴露成 MCP server。
+- embedding 后端：YAGNI；把「检索」抽成接口，数据涨起来再换向量实现。
+- 模型与运行位置（本地 vs 云端、隐私边界）：**实现阶段再定**（涉及 LLM 选型时核对 claude-api 参考）。
 
 ## 8. 语言策略（单一通用 skill，不做两套）
 
